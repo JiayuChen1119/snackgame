@@ -9,8 +9,8 @@ const scoreEl = document.getElementById("score");
 const eatSound = document.getElementById("eatSound");
 const crashSound = document.getElementById("crashSound");
 
-const box = 20;
-const canvasSize = 400;
+const box = 20; // 方格大小
+let canvasSize = { width: window.innerWidth, height: window.innerHeight }; // 畫布尺寸
 
 let snake = [];
 let food = {};
@@ -20,15 +20,23 @@ let gameInterval = null;
 let speed = 150;
 let paused = false;
 
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvasSize = { width: window.innerWidth, height: window.innerHeight };
+}
+
+resizeCanvas(); // 初始化畫布大小
+
 function spawnFood() {
   return {
-    x: Math.floor(Math.random() * (canvasSize / box)) * box,
-    y: Math.floor(Math.random() * (canvasSize / box)) * box,
+    x: Math.floor(Math.random() * (canvasSize.width / box)) * box,
+    y: Math.floor(Math.random() * (canvasSize.height / box)) * box,
   };
 }
 
 function resetGameState() {
-  snake = [{ x: 160, y: 200 }];
+  snake = [{ x: Math.floor(canvasSize.width / 2 / box) * box, y: Math.floor(canvasSize.height / 2 / box) * box }];
   direction = "RIGHT";
   food = spawnFood();
   score = 0;
@@ -40,7 +48,7 @@ function resetGameState() {
 function drawGame() {
   if (paused) return;
 
-  ctx.clearRect(0, 0, canvasSize, canvasSize);
+  ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
 
   // 畫蛇
   snake.forEach((s, i) => {
@@ -61,8 +69,8 @@ function drawGame() {
 
   // 撞牆或自己
   if (
-    head.x < 0 || head.x >= canvasSize ||
-    head.y < 0 || head.y >= canvasSize ||
+    head.x < 0 || head.x >= canvasSize.width ||
+    head.y < 0 || head.y >= canvasSize.height ||
     snake.some(s => s.x === head.x && s.y === head.y)
   ) {
     crashSound.play();
@@ -142,4 +150,5 @@ window.addEventListener("keydown", e => {
   }
 });
 
- 
+// 調整畫布大小
+window.addEventListener("resize", resizeCanvas);
